@@ -15,18 +15,24 @@ the average of each variable for each activity and each subject.
 ## libraries
 
 library(plyr)
+
 library(dplyr)
+
 library(utils)
+
 library(tibble)
 
 ## reading tables for data set for train and test; and feature names to name columns
 features <- read.table(file="./UCI HAR Dataset/features.txt", header = FALSE, col.names = c("index","feature_name"))
+
 X_train <- read.table(file="./UCI HAR Dataset/train/X_train.txt", header = FALSE)
+
 X_test <- read.table(file="./UCI HAR Dataset/test/X_test.txt", header = FALSE)
 
 ## 4. Step done in advance as to keep work simple
 ## naming columns in training and test data sets
 names(X_train) <- features$feature_name
+
 names(X_test) <- features$feature_name
 
 ## 1. Merging data sets' rows
@@ -37,9 +43,13 @@ X_all_meanstd <- select(X_all,grep("mean|std",names(X_all)))
 
 ## 3. Reading activity set and code for descriptive naming
 activity <- read.table(file="./UCI HAR Dataset/activity_labels.txt", header = FALSE, col.names = c("act_code","activity"))
+
 y_train <- read.table(file="./UCI HAR Dataset/train/y_train.txt")
+
 y_test <- read.table(file="./UCI HAR Dataset/test/y_test.txt")
+
 y_all <- rbind(y_train,y_test) ## merging rows
+
 y_all<- mutate(y_all, activity=activity[y_all[,],2]) ## generating descriptive column
 
 ## Adding descriptive naming 
@@ -50,14 +60,20 @@ X_all_meanstd <- mutate(X_all_meanstd,activity=y_all$activity)
 ## 5. Split by activity and subject who carried out the experiment
 ## Adding subject to data set
 subject_train <- read.table(file="./UCI HAR Dataset/train/subject_train.txt", header = FALSE, col.names="subject")
+
 subject_test <- read.table(file="./UCI HAR Dataset/test/subject_test.txt", header = FALSE, col.names="subject")
+
+
 subject_all <- rbind(subject_train, subject_test)
 ## adding subject variable
 X_all_meanstd <- mutate(X_all_meanstd,subject=subject_all$subject)
 
 ## Converting, grouping and creating the tidy df
 all_df <- as_tibble(X_all_meanstd)
+
 all_df <- group_by(all_df, activity, subject)
+
 tidy_data <- summarise_each(all_df,funs = mean)
+
 write.csv(tidy_data, file = "tidy_data.csv")
 
