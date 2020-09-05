@@ -75,5 +75,5 @@ all_df <- group_by(all_df, activity, subject)
 
 tidy_data <- summarise_each(all_df,funs = mean)
 
-write.csv(tidy_data, file = "tidy_data.csv")
+write.table(tidy_data, file = "tidy_data.txt")
 
